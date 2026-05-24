@@ -1,5 +1,8 @@
+SERVER.JS
+
 const express = require('express');
 const Gun = require('gun');
+require('gun-mongo-keyvalue'); 
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -7,11 +10,14 @@ const port = process.env.PORT || 3000;
 app.use(Gun.serve);
 
 const server = app.listen(port, () => {
-  console.log(`Relay Gun corriendo en el puerto ${port}`);
+  console.log(`Relay Gun con MongoDB corriendo en el puerto ${port}`);
 });
 
-// Los chismes se guardan en la carpeta segura /data de Render
 const gun = Gun({ 
   web: server,
-  file: '/data/todo_el_chisme' 
+  mongo: {
+    // Esto buscará una variable secreta en Render para no dejar tu clave a la vista de todos
+    connectionString: process.env.MONGO_URI,
+    collection: 'confesiones'
+  }
 });
